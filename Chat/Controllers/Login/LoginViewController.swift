@@ -7,8 +7,11 @@
 
 import UIKit
 import FirebaseAuth
+import JGProgressHUD
 
 class LoginViewController: UIViewController {
+    
+    private let spinner = JGProgressHUD(style: .dark)
     
     //
     private let scrollView: UIScrollView = {
@@ -79,7 +82,7 @@ class LoginViewController: UIViewController {
         let continueButton = UIButton(type: .system)
         continueButton.tintColor = UIColor.white
         continueButton.backgroundColor = UIColor.link
-        continueButton.layer.cornerRadius = 25
+        continueButton.layer.cornerRadius = 5
         continueButton.layer.masksToBounds = true
         continueButton.setTitle("Continue", for: .normal)
         continueButton.titleLabel?.font = .systemFont(ofSize: 18,
@@ -95,8 +98,8 @@ class LoginViewController: UIViewController {
         let createAccountButton = UIButton(type: .system)
         createAccountButton.setTitle("Create account",
                                      for: .normal)
-        createAccountButton.titleLabel?.font = .systemFont(ofSize: 15,
-                                                           weight: UIFont.Weight.regular)
+        createAccountButton.titleLabel?.font = .systemFont(ofSize: 18,
+                                                           weight: UIFont.Weight.medium)
         createAccountButton.addTarget(self,
                                       action: #selector(tapCreateAccount),
                                       for: .touchUpInside)
@@ -129,10 +132,17 @@ class LoginViewController: UIViewController {
             return
         }
         
+        spinner.show(in: view)
+        
         // 
         FirebaseAuth.Auth.auth().signIn(withEmail: email, password: password, completion: { [weak self] authDataResult, error in
+            
             guard let strongSelf = self else {
                 return
+            }
+            
+            DispatchQueue.main.async {
+                strongSelf.spinner.dismiss()
             }
             
             guard let dataResult = authDataResult, error == nil else {
@@ -183,13 +193,13 @@ class LoginViewController: UIViewController {
         // Size of the FB Messenger Icon
         let imageSize = scrollView.width/4
         imageView.frame = CGRect(x: (scrollView.width-imageSize)/2,
-                                 y: scrollView.height/5,
+                                 y: scrollView.height/7,
                                  width: imageSize,
                                  height: imageSize)
         
-        textLabel.frame = CGRect(x: 35,
+        textLabel.frame = CGRect(x: 0,
                                  y: imageView.bottom+25,
-                                 width: scrollView.width-70,
+                                 width: scrollView.width,
                                  height: 25)
         
         emailField.frame = CGRect(x: 30,
@@ -202,9 +212,9 @@ class LoginViewController: UIViewController {
                                     width: scrollView.width-60,
                                     height: 52)
         
-        continueButton.frame = CGRect(x: 130,
+        continueButton.frame = CGRect(x: 30,
                                       y: passwordField.bottom+25,
-                                      width: scrollView.width-260,
+                                      width: scrollView.width-60,
                                       height: 52)
         
         createAccountButton.frame = CGRect(x: 100,

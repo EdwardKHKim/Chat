@@ -7,8 +7,11 @@
 
 import UIKit
 import FirebaseAuth
+import JGProgressHUD
 
 class CreateAccountViewController: UIViewController {
+    
+    private let spinner = JGProgressHUD(style: .dark)
     
     //
     private let scrollView: UIScrollView = {
@@ -110,7 +113,7 @@ class CreateAccountViewController: UIViewController {
         let createAccountButton = UIButton(type: .system)
         createAccountButton.tintColor = UIColor.white
         createAccountButton.backgroundColor = UIColor.link
-        createAccountButton.layer.cornerRadius = 25
+        createAccountButton.layer.cornerRadius = 5
         createAccountButton.layer.masksToBounds = true
         createAccountButton.setTitle("Create account", for: .normal)
         createAccountButton.titleLabel?.font = .systemFont(ofSize: 18,
@@ -151,10 +154,16 @@ class CreateAccountViewController: UIViewController {
             return
         }
         
+        spinner.show(in: view)
+        
         //
         DatabaseManager.shared.userExists(with: email, completion: { [weak self] exists in
             guard let strongSelf = self else {
                 return
+            }
+            
+            DispatchQueue.main.async {
+                strongSelf.spinner.dismiss()
             }
             
             guard !exists else {
@@ -190,8 +199,8 @@ class CreateAccountViewController: UIViewController {
         let createAccountButton = UIButton(type: .system)
         createAccountButton.setTitle("Alredy have an account? Login.",
                                      for: .normal)
-        createAccountButton.titleLabel?.font = .systemFont(ofSize: 15,
-                                                           weight: UIFont.Weight.regular)
+        createAccountButton.titleLabel?.font = .systemFont(ofSize: 18,
+                                                           weight: UIFont.Weight.medium)
         createAccountButton.addTarget(self,
                                       action: #selector(tapToLoginView),
                                       for: .touchUpInside)

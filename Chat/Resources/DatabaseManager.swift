@@ -18,10 +18,10 @@ extension DatabaseManager {
     
     public func userExists(with email: String, completion: @escaping ((Bool) -> Void)) {
         
-        var correctEmail = email.replacingOccurrences(of: ".", with: "-")
-        correctEmail = correctEmail.replacingOccurrences(of: "@", with: "-")
+        var safeEmail = email.replacingOccurrences(of: ".", with: "-")
+        safeEmail = safeEmail.replacingOccurrences(of: "@", with: "-")
         
-        database.child(correctEmail).observeSingleEvent(of: .value, with: { snapshot in
+        database.child(safeEmail).observeSingleEvent(of: .value, with: { snapshot in
             guard snapshot.value as? String != nil else {
                 completion(false)
                 return
@@ -33,7 +33,7 @@ extension DatabaseManager {
     
     /// Add new user to database
     public func addUser(with user: User) {
-        database.child(user.correctEmail).setValue([
+        database.child(user.safeEmail).setValue([
             "first_name": user.firstName,
             "last_name": user.lastName
         ])
@@ -45,9 +45,9 @@ struct User {
     let lastName: String
     let email: String
     
-    var correctEmail: String {
-        var correctEmail = email.replacingOccurrences(of: ".", with: "-")
-        correctEmail = correctEmail.replacingOccurrences(of: "@", with: "-")
-        return correctEmail
+    var safeEmail: String {
+        var safeEmail = email.replacingOccurrences(of: ".", with: "-")
+        safeEmail = safeEmail.replacingOccurrences(of: "@", with: "-")
+        return safeEmail
     }
 }
