@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import FirebaseAuth
 
 class LoginViewController: UIViewController {
     
@@ -127,12 +128,22 @@ class LoginViewController: UIViewController {
             alertLoginError()
             return
         }
+        
+        // 
+        FirebaseAuth.Auth.auth().signIn(withEmail: email, password: password, completion: { authDataResult, error in
+            guard let dataResult = authDataResult, error == nil else {
+                print("Incorrect email or password")
+                return
+            }
+            let user = dataResult.user
+            print("\(user) information is correct")
+        })
     }
     
     //
     func alertLoginError() {
         let alert = UIAlertController(title: nil,
-                                      message: "Incorrect email or phone number",
+                                      message: "Incorrect email or password",
                                       preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Dismiss",
                                       style: .cancel,

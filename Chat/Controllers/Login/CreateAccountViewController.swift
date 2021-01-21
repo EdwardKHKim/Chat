@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import FirebaseAuth
 
 class CreateAccountViewController: UIViewController {
     
@@ -149,6 +150,15 @@ class CreateAccountViewController: UIViewController {
             alertCreateAccountError()
             return
         }
+        
+        //
+        FirebaseAuth.Auth.auth().createUser(withEmail: email, password: password, completion: { authDataResult, error in
+            guard let dataResult = authDataResult, error == nil else {
+                return
+            }
+            let user = dataResult.user
+            print("User is \(user)")
+        })
     }
     
     //
