@@ -152,19 +152,32 @@ class CreateAccountViewController: UIViewController {
         }
         
         //
-        FirebaseAuth.Auth.auth().createUser(withEmail: email, password: password, completion: { authDataResult, error in
-            guard let dataResult = authDataResult, error == nil else {
+        DatabaseManager.shared.userExists(with: email, completion: { [weak self] exists in
+            guard let strongSelf = self else {
                 return
             }
-            let user = dataResult.user
-            print("User is \(user)")
+            
+            guard !exists else {
+                strongSelf.alertCreateAccountError(message: "Email already in use.")
+                return
+            }
+            
+            //
+            FirebaseAuth.Auth.auth().createUser(withEmail: email, password: password, completion: { authDataResult, error in
+                guard authDataResult != nil, error == nil else {
+                    return
+                }
+                
+                DatabaseManager.shared.addUser(with: User(firstName: firstName, lastName: lastName, email: email))
+                strongSelf.navigationController?.dismiss(animated: true, completion: nil)
+            })
         })
     }
     
     //
-    func alertCreateAccountError() {
+    func alertCreateAccountError(message: String = "Invalid inputs. Password must be at least 6 characters.") {
         let alert = UIAlertController(title: nil,
-                                      message: "Invalid inputs. Password must be at least 6 characters",
+                                      message: message,
                                       preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Dismiss",
                                       style: .cancel,
@@ -226,9 +239,9 @@ class CreateAccountViewController: UIViewController {
         super.viewDidLayoutSubviews()
         scrollView.frame = view.bounds
         
-        let imageSize = scrollView.width/3
+        let imageSize = scrollView.width/2
         imageView.frame = CGRect(x: (scrollView.width-imageSize)/2,
-                                 y: scrollView.height/8,
+                                 y: scrollView.height/15,
                                  width: imageSize,
                                  height: imageSize)
         
