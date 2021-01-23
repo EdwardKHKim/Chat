@@ -177,7 +177,25 @@ class CreateAccountViewController: UIViewController {
                     return
                 }
                 
-                DatabaseManager.shared.addUser(with: User(firstName: firstName, lastName: lastName, email: email))
+                let appUser = User(firstName: firstName, lastName: lastName, email: email)
+                
+                DatabaseManager.shared.addUser(with: appUser, completion: { success in
+                    if success {
+                        guard let image = strongSelf.imageView.image, let data = image.pngData() else {
+                            return
+                        }
+                        let fileName = appUser.profilePhotoFileName
+                        StorageManager.shared.uploadProfilePhoto(with: data, fileName: fileName, completion: { result in
+                            switch result {
+                            case .success(let downloadURL):
+                                UserDefaults.standard.set(downloadURL, forKey: "profile_photo_url")
+                                print(downloadURL)
+                            case .failure(let error):
+                                print("\(error)")
+                            }
+                        })
+                    }
+                })
                 strongSelf.navigationController?.dismiss(animated: true, completion: nil)
             })
         })
